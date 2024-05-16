@@ -34,3 +34,7 @@ live_view_studio-*.tar
 # In case you use Node.js/npm, you want to ignore these.
 npm-debug.log
 /assets/node_modules/
+
+# Editor files
+.idea/
+.vscode/
