@@ -15,47 +15,22 @@ defmodule LiveViewStudioWeb.LightLive do
           <%= @brightness %>
         </span>
       </div>
-      <button phx-click="off">
-        <img src="/images/light-off.svg" />
-      </button>
-      <button phx-click="down">
-        <img src="/images/down.svg" />
-      </button>
-      <button phx-click="rand">
-        <img src="/images/fire.svg" />
-      </button>
-      <button phx-click="up">
-        <img src="/images/up.svg" />
-      </button>
-      <button phx-click="on">
-        <img src="/images/light-on.svg" />
-      </button>
+      <form phx-change="set">
+        <input
+          type="range"
+          min="0"
+          max="100"
+          name="brightness"
+          value={@brightness}
+        />
+      </form>
     </div>
     """
   end
 
-  def handle_event("on", _, socket) do
-    socket = assign(socket, brightness: 100)
-    {:noreply, socket}
-  end
-
-  def handle_event("down", _, socket) do
-    socket = update(socket, :brightness, &max(0, &1 - 10))
-    {:noreply, socket}
-  end
-
-  def handle_event("rand", _, socket) do
-    socket = assign(socket, brightness: Enum.random(0..100))
-    {:noreply, socket}
-  end
-
-  def handle_event("up", _, socket) do
-    socket = update(socket, :brightness, &min(&1 + 10, 100))
-    {:noreply, socket}
-  end
-
-  def handle_event("off", _, socket) do
-    socket = assign(socket, brightness: 0)
+  def handle_event("set", params, socket) do
+    %{"brightness" => b} = params
+    socket = assign(socket, brightness: String.to_integer(b))
     {:noreply, socket}
   end
 end
