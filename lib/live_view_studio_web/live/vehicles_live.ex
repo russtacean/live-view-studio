@@ -1,10 +1,14 @@
 defmodule LiveViewStudioWeb.VehiclesLive do
   use LiveViewStudioWeb, :live_view
 
+  alias LiveViewStudio.Vehicles
+
   def mount(_params, _session, socket) do
     socket =
       assign(socket,
-        vehicles: []
+        make_or_model: "",
+        vehicles: [],
+        loading: false
       )
 
     {:ok, socket}
@@ -14,20 +18,23 @@ defmodule LiveViewStudioWeb.VehiclesLive do
     ~H"""
     <h1>🚙 Find a Vehicle 🚘</h1>
     <div id="vehicles">
-      <form>
+      <form phx-submit="search">
         <input
           type="text"
-          name="query"
-          value=""
+          name="make_or_model"
+          value={@make_or_model}
           placeholder="Make or model"
           autofocus
           autocomplete="off"
+          readonly={@loading}
         />
 
         <button>
           <img src="/images/search.svg" />
         </button>
       </form>
+
+      <div :if={@loading} class="loader">Loading...</div>
 
       <div class="vehicles">
         <ul>
@@ -46,5 +53,23 @@ defmodule LiveViewStudioWeb.VehiclesLive do
       </div>
     </div>
     """
+  end
+
+  def handle_event("search", %{"make_or_model" => make_or_model}, socket) do
+    send(self(), {:run_search, make_or_model})
+
+    socket =
+      assign(socket,
+        make_or_model: make_or_model,
+        vehicles: [],
+        loading: true
+      )
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:run_search, make_or_model}, socket) do
+    vehicles = Vehicles.search(make_or_model)
+    {:noreply, assign(socket, vehicles: vehicles, loading: false)}
   end
 end
