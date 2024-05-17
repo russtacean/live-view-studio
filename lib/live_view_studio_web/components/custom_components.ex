@@ -36,4 +36,12 @@ defmodule LiveViewStudioWeb.CustomComponents do
     </span>
     """
   end
+
+  attr :visible, :boolean, default: false
+
+  def loading(assigns) do
+    ~H"""
+    <div :if={@visible} class="loader">Loading...</div>
+    """
+  end
 end
