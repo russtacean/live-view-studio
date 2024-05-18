@@ -3,6 +3,7 @@ defmodule LiveViewStudioWeb.DonationsLive do
 
   alias LiveViewStudio.Donations
   alias LiveViewStudioWeb.ParamValidation
+  alias LiveViewStudioWeb.TableSort
 
   def mount(_params, _session, socket) do
     {:ok, socket}
@@ -50,7 +51,7 @@ defmodule LiveViewStudioWeb.DonationsLive do
     params = %{
       assigns.options
       | sort_by: assigns.sort_by,
-        sort_order: next_sort_order(assigns.options.sort_order)
+        sort_order: TableSort.next_sort_order(assigns.options.sort_order)
     }
 
     assigns = assign(assigns, params: params)
@@ -58,7 +59,7 @@ defmodule LiveViewStudioWeb.DonationsLive do
     ~H"""
     <.link patch={~p"/donations?#{@params}"}>
       <%= render_slot(@inner_block) %>
-      <%= sort_indicator(@sort_by, @options) %>
+      <%= TableSort.sort_indicator(@sort_by, @options) %>
     </.link>
     """
   end
@@ -69,23 +70,6 @@ defmodule LiveViewStudioWeb.DonationsLive do
     socket = push_patch(socket, to: ~p"/donations?#{params}")
     {:noreply, socket}
   end
-
-  defp next_sort_order(sort_order) do
-    case sort_order do
-      :asc -> :desc
-      :desc -> :asc
-    end
-  end
-
-  defp sort_indicator(column, %{sort_by: sort_by, sort_order: sort_order})
-       when column == sort_by do
-    case sort_order do
-      :asc -> "👆"
-      :desc -> "👇"
-    end
-  end
-
-  defp sort_indicator(_, _), do: ""
 
   defp more_pages?(options, donation_count) do
     options.page * options.per_page < donation_count

@@ -3,6 +3,7 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
 
   alias LiveViewStudio.PizzaOrders
   alias LiveViewStudioWeb.ParamValidation
+  alias LiveViewStudioWeb.TableSort
   import Number.Currency
 
   def mount(_params, _session, socket) do
@@ -21,30 +22,13 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
   def sort_link(assigns) do
     ~H"""
     <.link patch={
-      ~p"/pizza-orders?#{%{sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"
+      ~p"/pizza-orders?#{%{sort_by: @sort_by, sort_order: TableSort.next_sort_order(@options.sort_order)}}"
     }>
       <%= render_slot(@inner_block) %>
-      <%= sort_indicator(@sort_by, @options) %>
+      <%= TableSort.sort_indicator(@sort_by, @options) %>
     </.link>
     """
   end
-
-  defp next_sort_order(sort_order) do
-    case sort_order do
-      :asc -> :desc
-      :desc -> :asc
-    end
-  end
-
-  defp sort_indicator(column, %{sort_by: sort_by, sort_order: sort_order})
-       when column == sort_by do
-    case sort_order do
-      :asc -> "👆"
-      :desc -> "👇"
-    end
-  end
-
-  defp sort_indicator(_, _), do: ""
 
   def handle_params(params, _uri, socket) do
     sort_order = ParamValidation.valid_sort_order(params)
