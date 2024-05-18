@@ -2,6 +2,7 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
   use LiveViewStudioWeb, :live_view
 
   alias LiveViewStudio.PizzaOrders
+  alias LiveViewStudioWeb.Pagination
   alias LiveViewStudioWeb.ParamValidation
   alias LiveViewStudioWeb.TableSort
   import Number.Currency
@@ -13,6 +14,33 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
       )
 
     {:ok, socket}
+  end
+
+  def handle_params(params, _uri, socket) do
+    sort_order = ParamValidation.valid_sort_order(params)
+    sort_by = valid_sort_by(params)
+    page = ParamValidation.param_to_integer(params["page"], 1)
+    per_page = ParamValidation.param_to_integer(params["per_page"], 5)
+
+    options = %{
+      sort_order: sort_order,
+      sort_by: sort_by,
+      page: page,
+      per_page: per_page
+    }
+
+    pizza_orders = PizzaOrders.list_pizza_orders(options)
+    order_count = PizzaOrders.count_pizza_orders()
+
+    socket =
+      assign(
+        socket,
+        pizza_orders: pizza_orders,
+        order_count: order_count,
+        options: options
+      )
+
+    {:noreply, socket}
   end
 
   attr :sort_by, :atom, required: true
@@ -30,14 +58,10 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
     """
   end
 
-  def handle_params(params, _uri, socket) do
-    sort_order = ParamValidation.valid_sort_order(params)
-    sort_by = valid_sort_by(params)
-
-    options = %{sort_order: sort_order, sort_by: sort_by}
-    pizza_orders = PizzaOrders.list_pizza_orders(options)
-
-    socket = assign(socket, pizza_orders: pizza_orders, options: options)
+  def handle_event("select-per-page", %{"per-page" => per_page}, socket) do
+    params = %{socket.assigns.options | per_page: per_page}
+    # push_patch causes handle_params to be invoked, same as clicking patch link on UI
+    socket = push_patch(socket, to: ~p"/pizza-orders?#{params}")
     {:noreply, socket}
   end
 
