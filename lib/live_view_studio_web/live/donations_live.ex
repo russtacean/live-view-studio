@@ -2,6 +2,7 @@ defmodule LiveViewStudioWeb.DonationsLive do
   use LiveViewStudioWeb, :live_view
 
   alias LiveViewStudio.Donations
+  alias LiveViewStudioWeb.Pagination
   alias LiveViewStudioWeb.ParamValidation
   alias LiveViewStudioWeb.TableSort
 
@@ -69,20 +70,5 @@ defmodule LiveViewStudioWeb.DonationsLive do
     # push_patch causes handle_params to be invoked, same as clicking patch link on UI
     socket = push_patch(socket, to: ~p"/donations?#{params}")
     {:noreply, socket}
-  end
-
-  defp more_pages?(options, donation_count) do
-    options.page * options.per_page < donation_count
-  end
-
-  defp pages(options, donation_count) do
-    page_count = ceil(donation_count / options.per_page)
-
-    for page_number <- (options.page - 2)..(options.page + 2), page_number > 0 do
-      if page_number <= page_count do
-        current_page? = page_number == options.page
-        {page_number, current_page?}
-      end
-    end
   end
 end
