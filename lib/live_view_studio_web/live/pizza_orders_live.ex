@@ -2,6 +2,7 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
   use LiveViewStudioWeb, :live_view
 
   alias LiveViewStudio.PizzaOrders
+  alias LiveViewStudioWeb.ParamValidation
   import Number.Currency
 
   def mount(_params, _session, socket) do
@@ -46,7 +47,7 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
   defp sort_indicator(_, _), do: ""
 
   def handle_params(params, _uri, socket) do
-    sort_order = valid_sort_order(params)
+    sort_order = ParamValidation.valid_sort_order(params)
     sort_by = valid_sort_by(params)
 
     options = %{sort_order: sort_order, sort_by: sort_by}
@@ -62,11 +63,4 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
   end
 
   defp valid_sort_by(_params), do: :id
-
-  defp valid_sort_order(%{"sort_order" => sort_order})
-       when sort_order in ~w(asc desc) do
-    String.to_atom(sort_order)
-  end
-
-  defp valid_sort_order(_params), do: :asc
 end

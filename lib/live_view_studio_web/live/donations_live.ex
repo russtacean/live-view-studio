@@ -2,6 +2,7 @@ defmodule LiveViewStudioWeb.DonationsLive do
   use LiveViewStudioWeb, :live_view
 
   alias LiveViewStudio.Donations
+  alias LiveViewStudioWeb.ParamValidation
 
   def mount(_params, _session, socket) do
     {:ok, socket}
@@ -9,9 +10,9 @@ defmodule LiveViewStudioWeb.DonationsLive do
 
   def handle_params(params, _uri, socket) do
     sort_by = valid_sort_by(params)
-    sort_order = valid_sort_order(params)
-    page = (params["page"] || "1") |> String.to_integer()
-    per_page = (params["per_page"] || "5") |> String.to_integer()
+    sort_order = ParamValidation.valid_sort_order(params)
+    page = ParamValidation.param_to_integer(params["page"], 1)
+    per_page = ParamValidation.param_to_integer(params["per_page"], 5)
 
     options = %{
       sort_by: sort_by,
@@ -31,19 +32,12 @@ defmodule LiveViewStudioWeb.DonationsLive do
     {:noreply, socket}
   end
 
-  defp valid_sort_by(%{"sort_by" => sort_by})
-       when sort_by in ~w(item quantity days_until_expires) do
+  def valid_sort_by(%{"sort_by" => sort_by})
+      when sort_by in ~w(item quantity days_until_expires) do
     String.to_atom(sort_by)
   end
 
-  defp valid_sort_by(_params), do: :id
-
-  defp valid_sort_order(%{"sort_order" => sort_order})
-       when sort_order in ~w(asc desc) do
-    String.to_atom(sort_order)
-  end
-
-  defp valid_sort_order(_params), do: :asc
+  def valid_sort_by(_params), do: :id
 
   attr :sort_by, :atom, required: true
   attr :options, :map, required: true
