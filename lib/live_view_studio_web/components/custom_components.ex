@@ -44,4 +44,19 @@ defmodule LiveViewStudioWeb.CustomComponents do
     <div :if={@visible} class="loader">Loading...</div>
     """
   end
+
+  attr :current_page, :map, required: true
+  attr :page_options, :list, default: [5, 10, 15, 20]
+
+  def per_page_select(assigns) do
+    ~H"""
+    <select name="per-page">
+      <%= Phoenix.HTML.Form.options_for_select(
+        @page_options || [5, 10, 15, 20],
+        @per_page
+      ) %>
+    </select>
+    <label for="per-page">per page</label>
+    """
+  end
 end
