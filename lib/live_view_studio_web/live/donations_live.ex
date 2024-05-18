@@ -14,6 +14,8 @@ defmodule LiveViewStudioWeb.DonationsLive do
     page = ParamValidation.param_to_integer(params["page"], 1)
     per_page = ParamValidation.param_to_integer(params["per_page"], 5)
 
+    donation_count = Donations.count_donations()
+
     options = %{
       sort_by: sort_by,
       sort_order: sort_order,
@@ -26,6 +28,7 @@ defmodule LiveViewStudioWeb.DonationsLive do
     socket =
       assign(socket,
         donations: donations,
+        donation_count: donation_count,
         options: options
       )
 
@@ -83,4 +86,8 @@ defmodule LiveViewStudioWeb.DonationsLive do
   end
 
   defp sort_indicator(_, _), do: ""
+
+  defp more_pages?(options, donation_count) do
+    options.page * options.per_page < donation_count
+  end
 end
