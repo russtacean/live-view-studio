@@ -45,7 +45,7 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
 
   defp sort_indicator(_, _), do: ""
 
-  def handle_params(params, uri, socket) do
+  def handle_params(params, _uri, socket) do
     sort_order = valid_sort_order(params)
     sort_by = valid_sort_by(params)
 
