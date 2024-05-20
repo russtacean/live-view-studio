@@ -62,12 +62,13 @@ defmodule LiveViewStudioWeb.ServersLive do
       </div>
       <div class="main">
         <%= if @live_action == :new do %>
-          <.form for={@form} phx-submit="save">
+          <.form for={@form} phx-change="validate" phx-submit="save">
             <div class="field">
               <.input
                 field={@form[:name]}
                 placeholder="Name"
                 autocomplete="off"
+                phx-debounce="1000"
               />
             </div>
             <div class="field">
@@ -75,6 +76,7 @@ defmodule LiveViewStudioWeb.ServersLive do
                 field={@form[:framework]}
                 placeholder="Framework"
                 autocomplete="off"
+                phx-debounce="1000"
               />
             </div>
             <div class="field">
@@ -82,6 +84,7 @@ defmodule LiveViewStudioWeb.ServersLive do
                 field={@form[:size]}
                 type="number"
                 placeholder="Size (MB)"
+                phx-debounce="blur"
               />
             </div>
 
@@ -157,5 +160,14 @@ defmodule LiveViewStudioWeb.ServersLive do
         socket = put_flash(socket, :error, "Unable to save server")
         {:noreply, assign(socket, :form, to_form(changeset))}
     end
+  end
+
+  def handle_event("validate", %{"server" => server_params}, socket) do
+    changeset =
+      %Server{}
+      |> Servers.change_server(server_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, form: to_form(changeset))}
   end
 end
