@@ -9,11 +9,25 @@ defmodule LiveViewStudioWeb.VolunteerFormComponent do
     {:ok, assign(socket, :form, to_form(changeset))}
   end
 
+  def update(assigns, socket) do
+    socket =
+      socket
+      # This is the default behavior if update() is not defined explicity
+      |> assign(assigns)
+      # This is behavior we're adding
+      |> assign(:count, assigns.count + 1)
+
+    {:ok, socket}
+  end
+
   def render(assigns) do
     # Live components require a single static HTML component at their root
     # hence the div here
     ~H"""
     <div>
+      <div class="count">
+        Go for it, you'll be volunteer number <%= @count %>
+      </div>
       <.form
         for={@form}
         phx-change="validate"
