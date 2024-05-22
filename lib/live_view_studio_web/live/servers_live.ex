@@ -5,6 +5,10 @@ defmodule LiveViewStudioWeb.ServersLive do
   alias LiveViewStudioWeb.ServerFormComponent
 
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Servers.subscribe()
+    end
+
     servers = Servers.list_servers()
 
     socket =
@@ -117,15 +121,26 @@ defmodule LiveViewStudioWeb.ServersLive do
     server = Servers.get_server!(id)
     {:ok, server} = Servers.toggle_server_status(server)
 
+    {:noreply, assign(socket, selected_server: server)}
+  end
+
+  def handle_info({:server_created, server}, socket) do
+    {:noreply, update(socket, :servers, fn servers -> [server | servers] end)}
+  end
+
+  def handle_info({:server_updated, server}, socket) do
+    socket =
+      if server.id == socket.assigns.selected_server.id do
+        assign(socket, selected_server: server)
+      else
+        socket
+      end
+
     servers =
       Enum.map(socket.assigns.servers, fn s ->
         if s.id == server.id, do: server, else: s
       end)
 
-    {:noreply, assign(socket, selected_server: server, servers: servers)}
-  end
-
-  def handle_info({:server_created, server}, socket) do
-    {:noreply, update(socket, :servers, fn servers -> [server | servers] end)}
+    {:noreply, assign(socket, servers: servers)}
   end
 end
