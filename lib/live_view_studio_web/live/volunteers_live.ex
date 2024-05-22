@@ -68,9 +68,7 @@ defmodule LiveViewStudioWeb.VolunteersLive do
 
   def handle_event("toggle-status", %{"id" => id}, socket) do
     volunteer = Volunteers.get_volunteer!(id)
-
     {:ok, volunteer} = Volunteers.toggle_status_volunteer(volunteer)
-
     {:noreply, stream_insert(socket, :volunteers, volunteer)}
   end
 
