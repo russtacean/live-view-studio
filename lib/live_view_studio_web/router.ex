@@ -37,7 +37,6 @@ defmodule LiveViewStudioWeb.Router do
     live "/shop", ShopLive
     live "/juggling", JugglingLive
     live "/desks", DesksLive
-    live "/bingo", BingoLive
     live "/vehicles", VehiclesLive
     live "/athletes", AthletesLive
     live "/pizza-orders", PizzaOrdersLive
@@ -88,6 +87,8 @@ defmodule LiveViewStudioWeb.Router do
       on_mount: [{LiveViewStudioWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+      live "/bingo", BingoLive
       live "/topsecret", TopSecretLive
     end
   end
