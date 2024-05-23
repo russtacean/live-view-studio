@@ -32,7 +32,6 @@ defmodule LiveViewStudioWeb.Router do
     live "/servers/:id", ServersLive
     live "/donations", DonationsLive
     live "/volunteers", VolunteersLive
-    live "/presence", PresenceLive
     live "/bookings", BookingsLive
     live "/shop", ShopLive
     live "/juggling", JugglingLive
@@ -89,6 +88,7 @@ defmodule LiveViewStudioWeb.Router do
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
 
       live "/bingo", BingoLive
+      live "/presence", PresenceLive
       live "/topsecret", TopSecretLive
     end
   end

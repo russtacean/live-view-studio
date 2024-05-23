@@ -1,14 +1,6 @@
 defmodule LiveViewStudioWeb.TopSecretLive do
   use LiveViewStudioWeb, :live_view
 
-  # Causes LiveViewStudioWeb.UserAuth.on_mount matching the atom here to be called
-  # Called before both the initial disconnected mount (initial render), and
-  # the subsequent connected mount (websocket connection).
-  # Seemingly this doubles up on authentication the router plug is also doing,
-  # but we want this here as well in case a link navigates/patches to this liveview
-  # over an existing websocket connection
-  on_mount {LiveViewStudioWeb.UserAuth, :ensure_authenticated}
-
   def mount(_params, _session, socket) do
     {:ok, socket}
   end
