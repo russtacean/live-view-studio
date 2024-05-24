@@ -1,15 +1,30 @@
 defmodule LiveViewStudioWeb.BingoLive do
   use LiveViewStudioWeb, :live_view
 
+  alias LiveViewStudioWeb.Presence
+
+  @topic "users:bingo"
+
   def mount(_params, _session, socket) do
+    %{current_user: current_user} = socket.assigns
+
     if connected?(socket) do
       :timer.send_interval(3000, self(), :tick)
+      Presence.subscribe(@topic)
     end
+
+    join_time = Timex.now() |> Timex.format!("%H:%M", :strftime)
+
+    {:ok, _} =
+      Presence.track_user(current_user, @topic, %{
+        join_time: join_time
+      })
 
     socket =
       assign(socket,
         number: nil,
-        numbers: all_numbers()
+        numbers: all_numbers(),
+        presences: Presence.list_unique_users(@topic)
       )
 
     {:ok, socket}
@@ -19,6 +34,18 @@ defmodule LiveViewStudioWeb.BingoLive do
     ~H"""
     <h1>Bingo Boss 📢</h1>
     <div id="bingo">
+      <div class="users">
+        <ul>
+          <li :for={{_user_id, meta} <- @presences}>
+            <span class="username">
+              <%= meta.username %>
+            </span>
+            <span class="timestamp">
+              <%= meta.join_time %>
+            </span>
+          </li>
+        </ul>
+      </div>
       <div class="number">
         <%= @number %>
       </div>
@@ -53,5 +80,9 @@ defmodule LiveViewStudioWeb.BingoLive do
       Enum.map(numbers, &"#{letter} #{&1}")
     end)
     |> Enum.shuffle()
+  end
+
+  def handle_info(%{event: "presence_diff", payload: diff}, socket) do
+    {:noreply, Presence.handle_diff(socket, diff)}
   end
 end
