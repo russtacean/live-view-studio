@@ -18,7 +18,7 @@ defmodule LiveViewStudioWeb.ShopLive do
     {:noreply, assign(socket, :cart, cart)}
   end
 
-  def toggle_cart(js \\ %JS{}) do
+  def toggle_cart() do
     JS.toggle(
       to: "#cart",
       in: {

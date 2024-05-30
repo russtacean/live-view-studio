@@ -3,6 +3,7 @@ defmodule LiveViewStudioWeb.VolunteersLive do
 
   alias LiveViewStudio.Volunteers
   alias LiveViewStudioWeb.VolunteerFormComponent
+  alias Phoenix.LiveView.JS
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
@@ -52,15 +53,23 @@ defmodule LiveViewStudioWeb.VolunteersLive do
         <%= @volunteer.phone %>
       </div>
       <div class="status">
-        <button phx-click="toggle-status" phx-value-id={@volunteer.id}>
+        <button phx-click={
+          JS.push("toggle-status", value: %{id: @volunteer.id})
+          |> JS.transition("shake", to: "##{@id}", time: 400)
+        }>
           <%= if @volunteer.checked_out,
             do: "Check In",
             else: "Check Out" %>
         </button>
         <.link
           class="delete"
-          phx-click="delete"
-          phx-value-id={@volunteer.id}
+          phx-click={
+            JS.push("delete", value: %{id: @volunteer.id})
+            |> JS.hide(
+              to: "##{@id}",
+              transition: "ease duration-1000 scale-150"
+            )
+          }
           data-confirm="Are you sure you want to delete this volunteer?"
         >
           <.icon name="hero-trash-solid" />
